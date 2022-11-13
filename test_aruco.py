@@ -1,11 +1,9 @@
 # /usr/bin/python3
 
 import rospy 
-import cv2
-
-# local modules
 from aruco_cube import ArucoCube
 from camera import Camera
+import cv2
 
 if __name__ == '__main__':
 
@@ -28,22 +26,17 @@ if __name__ == '__main__':
 
         if frame is None:
             continue
-
+        
         # detect cube and estimate pose of the cube 
         # gettting the transformation matrix
         trans = cube.detect(frame)
 
-        # draw cube on frame 
         frame = cube.drawFaces(frame)
 
         cv2.imshow("frame", frame)
-        # TODO: inverse kinematics
-        # q = inverse_kinematics(trans) 
-
-        # TODO: send joint angles to esp32
-        # send_joint_angles(q)
 
         # sleep
         rate.sleep()
         cv2.waitKey(1)
+
     

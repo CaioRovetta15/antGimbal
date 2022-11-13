@@ -7,11 +7,12 @@ import rospy
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import traceback
+import time
 
 bridge = CvBridge()
 
 class Camera:
-    def __init__(self, device_id:int=0, fps:float=30, width:int=640, height:int=480, autofocus:bool=True) -> None:
+    def __init__(self, device_id:int=0, fps:float=30, width:int=640, height:int=480, autofocus:int=0) -> None:
         
         # device id
         self.device_id = device_id
@@ -44,17 +45,24 @@ class Camera:
         self.cam.set(cv2.CAP_PROP_AUTOFOCUS, self.autofocus)
         self.cam.set(cv2.CAP_PROP_FOCUS, self.autofocus)
 
+        # Waiting camera to start
+        while self.cam.read()[0] is False:
+            time.sleep(0.5)
+            pass
+
         # start stream and publish it to ROS for debug purposes
         self.cam_pub = rospy.Publisher('camera/image_raw', Image, queue_size=1)
         rospy.Timer(rospy.Duration(1.0/self.fps), self.__readAndPublish, reset=True)
 
-    def __readAndPublish(self):
+        return True
+
+    def __readAndPublish(self, event):
         try:
             ret, frame = self.cam.read()
             
             # check if frame is ok
             if not ret:
-                rospy.logerr("Error reading frame from camera")
+                rospy.logwarn("Error reading frame from camera")
                 return False
 
             # update frame atribute
@@ -71,5 +79,9 @@ class Camera:
             # print error
             traceback.print_exc()
 
-    def getFrame(self, cam):
+    def getFrame(self):
+        if self.frame is None:
+            rospy.logwarn("Image is empty...")
+            return None
+        
         return self.frame
