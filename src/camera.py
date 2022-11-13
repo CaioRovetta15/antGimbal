@@ -46,14 +46,17 @@ class Camera:
         self.cam.set(cv2.CAP_PROP_FOCUS, self.autofocus)
 
         # Waiting camera to start
-        while self.cam.read()[0] is False:
+        ret, self.frame = self.cam.read()
+        while (ret is False) or (self.frame is None):
             time.sleep(0.5)
-            pass
+            ret, self.frame = self.cam.read()
+            continue
 
         # start stream and publish it to ROS for debug purposes
         self.cam_pub = rospy.Publisher('camera/image_raw', Image, queue_size=1)
         rospy.Timer(rospy.Duration(1.0/self.fps), self.__readAndPublish, reset=True)
 
+        print("[INFO] video stream started...")
         return True
 
     def __readAndPublish(self, event):
@@ -69,8 +72,8 @@ class Camera:
             self.frame = frame
 
             # publish on ros
-            bridge.cv2_to_imgmsg(self.frame, encoding="bgr8")
-            self.cam_pub.publish()
+            ros_img = bridge.cv2_to_imgmsg(self.frame, encoding="bgr8")
+            self.cam_pub.publish(ros_img)
         except Exception as e:
             # When everything done, release the capture
             self.cam.release()

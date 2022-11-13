@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <node name="static_tf_publisher" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.1 0.0 0.0 0.0 0.0 world camera_optical" />
+
+    <node name="ant_gimbal" pkg="ant_gimbal" type="main.py"/>
+
+    <node name="rviz" pkg="rviz" type="rviz" />
+</launch>

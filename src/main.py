@@ -1,4 +1,4 @@
-# /usr/bin/python3
+#! /usr/bin/python3
 
 import rospy 
 import cv2
@@ -6,6 +6,7 @@ import cv2
 # local modules
 from aruco_cube import ArucoCube
 from camera import Camera
+import tf_publisher
 
 if __name__ == '__main__':
 
@@ -25,7 +26,6 @@ if __name__ == '__main__':
     while not rospy.is_shutdown():
         # get frame
         frame = cam.getFrame()
-
         if frame is None:
             continue
 
@@ -33,15 +33,20 @@ if __name__ == '__main__':
         # gettting the transformation matrix
         trans = cube.detect(frame)
 
-        # draw cube on frame 
-        frame = cube.drawFaces(frame)
+        if trans:
+            # draw cube on frame 
+            frame = cube.drawFaces(frame)
+
+            # TODO: inverse kinematics
+            # q = inverse_kinematics(trans) 
+
+            # TODO: send joint angles to esp32
+            # send_joint_angles(q)
+
+            # send transformations to tf
+            tf_publisher.sendAllTransforms([trans], ['camera_optical'], ['cube'])
 
         cv2.imshow("frame", frame)
-        # TODO: inverse kinematics
-        # q = inverse_kinematics(trans) 
-
-        # TODO: send joint angles to esp32
-        # send_joint_angles(q)
 
         # sleep
         rate.sleep()
