@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
+    <!-- Reference world definition -->
     <node name="static_tf_publisher" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.1 0.0 0.0 0.0 0.0 world camera_optical" />
 
+    <!-- Relationship of target and camera -->
+    <node name="static_tf_publisher" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.1 0.0 0.0 0.0 0.0 target camera_optical" />
+
+    <!-- Relationship of cube and robot base -->
+    <node name="static_tf_publisher" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.0 -0.05 0.0 0.0 0.0 cube robot_base" />
+
+    <!-- ant_node -->
     <node name="ant_gimbal" pkg="ant_gimbal" type="main.py"/>
 
+    <!-- rviz for visualization -->
     <node name="rviz" pkg="rviz" type="rviz" />
 </launch>
