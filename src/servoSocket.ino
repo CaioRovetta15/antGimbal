@@ -84,11 +84,11 @@ void loop() {
     */
     if (theta1 <= 2) servo1.write(5);
     else servo1.write(theta1);
-    if (theta2 <= 2) servo1.write(5);
+    if (theta2 <= 2) servo2.write(5);
     else servo2.write(theta2);
     if (theta1 >= 178) servo1.write(175);
     else servo1.write(theta1);
-    if (theta2 >= 178) servo1.write(175);
+    if (theta2 >= 178) servo2.write(175);
     else servo2.write(theta2);
   }
 }
