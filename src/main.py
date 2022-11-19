@@ -38,7 +38,7 @@ if __name__ == '__main__':
             # draw cube on frame 
             frame = cube.drawFaces(frame)
 
-            q = inverse_kinematics(robot,trans) 
+            q = kinematics.inverse_kinematics(robot,trans) 
 
             # TODO: send joint angles to esp32
             # send_joint_angles(q)
