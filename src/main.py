@@ -7,6 +7,7 @@ import cv2
 from aruco_cube import ArucoCube
 from camera import Camera
 import tf_publisher
+import kinematics
 
 if __name__ == '__main__':
 
@@ -21,7 +22,7 @@ if __name__ == '__main__':
 
     # start camera
     cam.startCam()
-
+    robot = kinematics.DHRobot()
     # main loop
     while not rospy.is_shutdown():
         # get frame
@@ -37,8 +38,7 @@ if __name__ == '__main__':
             # draw cube on frame 
             frame = cube.drawFaces(frame)
 
-            # TODO: inverse kinematics
-            # q = inverse_kinematics(trans) 
+            q = inverse_kinematics(robot,trans) 
 
             # TODO: send joint angles to esp32
             # send_joint_angles(q)
