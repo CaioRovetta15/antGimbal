@@ -31,7 +31,7 @@ if __name__ == '__main__':
             continue
 
         # detect cube and estimate pose of the cube 
-        # gettting the transformation matrix
+        # getting the transformation matrix
         trans = cube.detect(frame)
 
         if trans:
