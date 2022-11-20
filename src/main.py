@@ -33,7 +33,10 @@ if __name__ == '__main__':
 
     # start camera
     cam.startCam()
+
+    # start robot kinematics
     robot = kinematics.DHRobot()
+
     # main loop
     while not rospy.is_shutdown():
         # get frame
@@ -43,20 +46,25 @@ if __name__ == '__main__':
 
         # detect cube and estimate pose of the cube 
         # getting the transformation matrix
-        trans = cube.detect(frame)
+        T_cam_cube = cube.detect(frame)
 
-        if trans is not None:
+        if T_cam_cube is not None:
             # draw cube on frame 
             frame = cube.drawFaces(frame)
             publishImageDebug(frame)
 
-            q = kinematics.inverse_kinematics(robot,trans) 
+            # send transformations to tf
+            tf_publisher.sendAllTransforms([T_cam_cube], ['camera_optical'], ['cube'])
+
+            T_robot_target = tf_publisher.getTransform('base_link', 'target')
+
+            # get the angles of the robot
+            q = kinematics.inverse_kinematics(robot,T_robot_target) 
 
             # TODO: send joint angles to esp32
             # send_joint_angles(q)
 
-            # send transformations to tf
-            tf_publisher.sendAllTransforms([trans], ['camera_optical'], ['cube'])
+            
         else:
             publishImageDebug(frame)
             
