@@ -48,7 +48,7 @@ def robotNormals(robot,robot_base,target_point=[0.0,0.0,0.0]):
 
 
 def inverseKinematics(robot,work_space_target):
-    T=sm.SE3(work_space_target[0],work_space_target[1],work_space_target[2])
+    T = sm.SE3(work_space_target[0],work_space_target[1],work_space_target[2])
     T.print()
     Ttrans=sm.SE3(0,0,0)
 
@@ -84,7 +84,7 @@ def inverseKinematics(robot,work_space_target):
 
 
 def inverse_kinematics(robot=DHRobot(),robot_base=sm.SE3(1.0, 0.0, .5)):
-    work_space_target, normal_vectors=robotNormals(robot,robot_base)
+    work_space_target, normal_vectors = robotNormals(robot, robot_base)
     print(work_space_target)
     q=inverseKinematics(robot,work_space_target)
     print('inverse kinematics:',q)
