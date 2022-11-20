@@ -1,17 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<!-- <?xml version="1.0" encoding="UTF-8"?> -->
 <launch>
+    <param name="pi/2" value="$(eval 3.14159265/2)" />
+    <param name="pi" value="$(eval 3.14159265)" />
+
     <!-- Reference world definition -->
-    <node name="static_tf_publisher" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.1 0.0 0.0 0.0 0.0 world camera_optical" />
+    <node name="static_tf_publisher_0" pkg="tf2_ros" type="static_transform_publisher" args="1.0 0.0 0.5 1.5708 0.0 -1.5708 world camera_optical" />
 
-    <!-- Relationship of target and camera -->
-    <node name="static_tf_publisher" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.1 0.0 0.0 0.0 0.0 target camera_optical" />
+    <!-- Relationship btw target and camera -->
+    <node name="static_tf_publisher_1" pkg="tf2_ros" type="static_transform_publisher" args="0.0 -0.20 0.0 1.5708 -1.5708 0.0 camera_optical target" />
 
-    <!-- Relationship of cube and robot base -->
-    <node name="static_tf_publisher" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.0 -0.05 0.0 0.0 0.0 cube robot_base" />
+    <!-- Relationship btw cube and robot base -->
+    <node name="static_tf_publisher_2" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.0 -0.05 3.1415 3.1415 0.0 cube robot_base" />
 
-    <!-- ant_node -->
+    <!-- Start ant_gimbal node -->
     <node name="ant_gimbal" pkg="ant_gimbal" type="main.py"/>
 
     <!-- rviz for visualization -->
-    <node name="rviz" pkg="rviz" type="rviz" />
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ant_gimbal)/rviz/config.rviz"/>
 </launch>

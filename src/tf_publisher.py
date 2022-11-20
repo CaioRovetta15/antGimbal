@@ -24,8 +24,8 @@ def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
     for i in range(len(T_list)):
         tf_msg = TransformStamped()
         tf_msg.header.stamp = rospy.Time.now()
-        tf_msg.header.frame_id = "world"
-        tf_msg.child_frame_id = "cube_face_" + str(i)
+        tf_msg.header.frame_id = frame_ids[i]
+        tf_msg.child_frame_id = parent_frame_ids[i]
         tf_msg.transform.translation.x = T_list[i][0][3]
         tf_msg.transform.translation.y = T_list[i][1][3]
         tf_msg.transform.translation.z = T_list[i][2][3]
@@ -36,6 +36,7 @@ def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
         tf_msg.transform.rotation.z = q[2]
         tf_msg.transform.rotation.w = q[3]
         tf_list.append(tf)
-
+        br.sendTransform(tf_msg)
+    
     # Send all TF messages
-    br.sendTransform(tf_list)
+    # br.sendTransform(tf_list)

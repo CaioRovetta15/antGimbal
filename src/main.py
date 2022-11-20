@@ -2,11 +2,19 @@
 
 import rospy 
 import cv2
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge, CvBridgeError
 
 # local modules
 from aruco_cube import ArucoCube
 from camera import Camera
 import tf_publisher
+
+bridge = CvBridge()
+
+# Publish image debug of the cube
+def publishImageDebug(frame):
+    image_cube_pub.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
 
 if __name__ == '__main__':
 
@@ -14,6 +22,9 @@ if __name__ == '__main__':
     print("Starting node")
     rospy.init_node('antenna_controller', disable_signals=True)
     rate = rospy.Rate(100)
+
+    # Create image debug publisher
+    image_cube_pub = rospy.Publisher('aruco_cube/image_debug', Image, queue_size=1)
 
     # create camera and cube
     cam = Camera()
@@ -33,9 +44,10 @@ if __name__ == '__main__':
         # gettting the transformation matrix
         trans = cube.detect(frame)
 
-        if trans:
+        if trans is not None:
             # draw cube on frame 
             frame = cube.drawFaces(frame)
+            publishImageDebug(frame)
 
             # TODO: inverse kinematics
             # q = inverse_kinematics(trans) 
@@ -45,8 +57,10 @@ if __name__ == '__main__':
 
             # send transformations to tf
             tf_publisher.sendAllTransforms([trans], ['camera_optical'], ['cube'])
-
-        cv2.imshow("frame", frame)
+        else:
+            publishImageDebug(frame)
+            
+        # cv2.imshow("frame", frame)
 
         # sleep
         rate.sleep()
