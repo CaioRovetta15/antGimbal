@@ -9,6 +9,7 @@ from cv_bridge import CvBridge, CvBridgeError
 from aruco_cube import ArucoCube
 from camera import Camera
 import tf_publisher
+import kinematics
 
 bridge = CvBridge()
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
 
     # start camera
     cam.startCam()
-
+    robot = kinematics.DHRobot()
     # main loop
     while not rospy.is_shutdown():
         # get frame
@@ -41,7 +42,7 @@ if __name__ == '__main__':
             continue
 
         # detect cube and estimate pose of the cube 
-        # gettting the transformation matrix
+        # getting the transformation matrix
         trans = cube.detect(frame)
 
         if trans is not None:
@@ -49,8 +50,7 @@ if __name__ == '__main__':
             frame = cube.drawFaces(frame)
             publishImageDebug(frame)
 
-            # TODO: inverse kinematics
-            # q = inverse_kinematics(trans) 
+            q = kinematics.inverse_kinematics(robot,trans) 
 
             # TODO: send joint angles to esp32
             # send_joint_angles(q)
