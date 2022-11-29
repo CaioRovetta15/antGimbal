@@ -49,10 +49,10 @@ def robotNormals(robot,robot_base,target_point=[0.0,0.0,0.0]):
 def inverseKinematics(robot,work_space_target):
     T = sm.SE3(work_space_target[0],work_space_target[1],work_space_target[2])
     T.print()
-    # Ttrans=sm.SE3(0,0,0)
+    Ttrans=sm.SE3(0,0,0)
 
     #na simulacao o metodo utilizando as trasnsfromacoes de rotacao de pitch e yaw nao funcionou de maneira satisfatoria
-    # sol_trasnf = robot.ikine_LM(Ttrans,mask=[0,0,0,0,1,1],search=True)
+    sol_trasnf = robot.ikine_LM(Ttrans,mask=[0,0,0,1,1,1],search=False)
     print(robot.base)
     sol_norm = robot.ikine_LM(T,mask=[1,1,1,0,0,0],search=False)
 
