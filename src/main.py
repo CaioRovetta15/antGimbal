@@ -24,6 +24,7 @@ if __name__ == '__main__':
     print("Starting node")
     rospy.init_node('antenna_controller', disable_signals=True)
     rate = rospy.Rate(100)
+    tf_publisher.init_tf_buffer()
 
     # Create image debug publisher
     image_cube_pub = rospy.Publisher('aruco_cube/image_debug', Image, queue_size=1)

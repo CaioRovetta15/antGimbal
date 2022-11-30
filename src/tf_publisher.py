@@ -16,11 +16,18 @@ from geometry_msgs.msg import Transform
 from geometry_msgs.msg import TransformStamped
 from geometry_msgs.msg import Vector3
 
-# Create a TF broadcaster
-br = tf2_ros.TransformBroadcaster()
+tfBuffer = None
 
- # Create a TF listener
-tfBuffer = tf2_ros.Buffer()
+# create a TF buffer
+def init_tf_buffer():
+    """Initialize the TF buffer
+
+    @return: Nothing
+    """
+    global tfBuffer
+    tfBuffer = tf2_ros.Buffer()
+    listener = tf2_ros.TransformListener(tfBuffer)
+    return
 
 # Latch list to not publish same data on tf
 T_list_old = []
@@ -28,6 +35,9 @@ T_list_old = []
 # This function sends the transformation matrix using TF library
 def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
     
+    # Create a TF broadcaster
+    br = tf2_ros.TransformBroadcaster()
+
     if len(T_list) != len(frame_ids) or len(T_list) != len(parent_frame_ids):
         # raise exception
         raise Exception("The length of the T_list, frame_ids and parent_frame_ids must be the same")
@@ -44,6 +54,7 @@ def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
             if (np.allclose(old, new)):
                 print("Same data. Ignoring.")
                 break
+            print("New data. Publishing.")
 
         tf_msg = TransformStamped()
         tf_msg.header.stamp = rospy.Time.now()
@@ -69,13 +80,11 @@ def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
 
 def getTransform(frame_id, child_frame_id):
     
-    listener = tf2_ros.TransformListener(tfBuffer)
-    
     # Get the transformation matrix
     try:
         trans = tfBuffer.lookup_transform(frame_id, child_frame_id, rospy.Time())
     except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
-        # print(e)
+        print(e)
         return None
         
     # Convert the transformation matrix to a numpy array
