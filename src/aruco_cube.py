@@ -108,7 +108,7 @@ class ArucoCube:
         T = np.append(T, np.expand_dims(tvec,1), axis=1)
         T = np.append(T, np.array([[0, 0, 0, 1]]), axis=0)
 
-        print(T)
+        # print(T)
         return T
 
     def detect(self, frame: np.array):

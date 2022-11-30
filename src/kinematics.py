@@ -5,6 +5,7 @@ import numpy as np
 import math
 import matplotlib.pyplot as plt
 import open3d as o3d
+import rospy
 
 def DHRobot(d1 = 0.18061, d2 = 0.00665, a1= -0.00654 , a2=0.0, alpha1=math.pi/2, alpha2=-math.pi/2,offset1=-math.pi/2,offset2=math.pi/2):
     Link1 = rtb.RevoluteDH(alpha=alpha1, a=a1, d=d1,offset=offset1,qlim=[-math.pi/2,math.pi/2])
@@ -55,7 +56,7 @@ def inverseKinematics(robot, target_point):
     #na simulacao o metodo utilizando as trasnsfromacoes de rotacao de pitch e yaw nao funcionou de maneira satisfatoria
     sol_trasnf = robot.ik_lm_chan(Ttrans,we=[1,1,1,0,0,0])
     # print(robot.base)
-    print(sol_trasnf)
+    # print(sol_trasnf)
     #test on forward kinematics
     # robot.plot(Q=sol_trasnf[0],block=True)
     return sol_trasnf[0]
@@ -84,12 +85,15 @@ def inverseKinematics(robot, target_point):
 #     plt.show()
 
 
-def inverse_kinematics(robot=DHRobot(),robot_base=sm.SE3(-.6, -1.0, 0.5)):
-    target_point=[1.0,0.0,0.0]
+def inverse_kinematics(robot_target,robot=DHRobot()):
+
+    target_point=sm.SE3(robot_target).t
+    # rospy.loginfo(robot_target)
     # work_space_target, normal_vectors = robotNormals(robot, robot_base)
     # print(work_space_target)
     q=inverseKinematics(robot,target_point)
-    print('inverse kinematics:',q)
+    f="inverse_kinematics" + str((q[0]*180/math.pi,q[1]*180/math.pi))
+    # rospy.loginfo(f)
     return (q[0],q[1])
     # visualize(robot,work_space,normal_vectors,[0.0,0.0,0.0])
 if __name__ == "__main__":

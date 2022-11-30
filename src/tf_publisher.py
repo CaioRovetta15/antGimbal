@@ -21,7 +21,9 @@ br = tf2_ros.TransformBroadcaster()
 
  # Create a TF listener
 tfBuffer = tf2_ros.Buffer()
-# listener = tf2_ros.TransformListener(tfBuffer)
+
+# Latch list to not publish same data on tf
+T_list_old = []
 
 # This function sends the transformation matrix using TF library
 def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
@@ -32,9 +34,17 @@ def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
 
     # Create a list of TF messages
     tf_list = []
+    global T_list_old
 
     # Create a TF message for each transformation matrix
     for i in range(len(T_list)):
+        if (i < len(T_list_old)):
+            old = np.array(T_list_old[i], dtype=np.float16)
+            new = np.array(T_list[i], dtype=np.float16)
+            if (np.allclose(old, new)):
+                print("Same data. Ignoring.")
+                break
+
         tf_msg = TransformStamped()
         tf_msg.header.stamp = rospy.Time.now()
         tf_msg.header.frame_id = frame_ids[i]
@@ -53,14 +63,21 @@ def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
         # send the TF message
         br.sendTransform(tf_msg)
     
+    
+    T_list_old = T_list
+    return
+
 def getTransform(frame_id, child_frame_id):
-   
+    
+    listener = tf2_ros.TransformListener(tfBuffer)
+    
     # Get the transformation matrix
     try:
         trans = tfBuffer.lookup_transform(frame_id, child_frame_id, rospy.Time())
-    except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+    except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+        # print(e)
         return None
-    
+        
     # Convert the transformation matrix to a numpy array
     T = msg_to_se3(trans)
     return T
