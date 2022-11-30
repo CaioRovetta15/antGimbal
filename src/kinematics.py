@@ -83,8 +83,8 @@ def inverseKinematics(robot,work_space_target):
 
 
 def inverse_kinematics(robot=DHRobot(),robot_base=sm.SE3(1.0, 0.0, .5)):
-    work_space_target, normal_vectors = robotNormals(robot, robot_base)
-    print(work_space_target)
+    # work_space_target, normal_vectors = robotNormals(robot, robot_base)
+    # print(work_space_target)
     q=inverseKinematics(robot,work_space_target)
     print('inverse kinematics:',q)
     return (q[0],q[1])
