@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
             T_robot_target = tf_publisher.getTransform('base_link', 'target')
 
-            print(T_robot_target)
+            # print(T_robot_target)
             # get the angles of the robot
             q = kinematics.inverse_kinematics(T_robot_target,robot) 
 
