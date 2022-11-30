@@ -21,7 +21,7 @@ br = tf2_ros.TransformBroadcaster()
 
  # Create a TF listener
 tfBuffer = tf2_ros.Buffer()
-listener = tf2_ros.TransformListener(tfBuffer)
+# listener = tf2_ros.TransformListener(tfBuffer)
 
 # This function sends the transformation matrix using TF library
 def sendAllTransforms(T_list, frame_ids, parent_frame_ids):

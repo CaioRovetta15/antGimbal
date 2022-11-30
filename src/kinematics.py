@@ -1,7 +1,6 @@
 #! /usr/bin/python3
 import roboticstoolbox as rtb
 import spatialmath as sm
-from sympy import *
 import numpy as np
 import math
 import matplotlib.pyplot as plt

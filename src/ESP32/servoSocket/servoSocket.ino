@@ -1,7 +1,5 @@
-#include <dummy.h>
-
 #include <WiFi.h>
-#include <ESP32Servo.h>
+#include <Servo.h>
 
 #define SSID "Eu tenho internet"
 #define PASSWD "batatabatata"
@@ -14,28 +12,26 @@ Servo servo1, servo2;
 int servoPin1 = 25;
 int servoPin2 = 27;
 const uint16_t port = 8890;
-const char *host = "192.168.0.2";
+const char *host = "192.168.0.115";
 int theta1, theta2, flag;
 
 void setup() {
   Serial.begin(9600);
-
   WiFi.begin(SSID, PASSWD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(100);
   }
-
   // Prints own IP
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
-  servo1.attach(servoPin1, 500, 2400);
-  servo2.attach(servoPin2, 500, 2400);
+  servo1.attach(servoPin1);
+  servo2.attach(servoPin2);
 }
 
 void loop() {
   WiFiClient client;
-  String msg;
+  String msg = "";
   // Connect to server
   while (!client.connected()) {
     Serial.println("Tentando conectar com IP: 192.168.0.115");

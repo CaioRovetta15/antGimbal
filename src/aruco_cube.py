@@ -101,7 +101,7 @@ class ArucoCube:
         if not retval:
             return None
         
-        frame = aruco.drawAxis(frame, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.03)
+        frame = cv2.drawFrameAxes(frame, self.camera_matrix, self.dist_coeffs, rvec, tvec, 0.03)
 
         # # get the transformation
         T = cv2.Rodrigues(rvec)[0]
