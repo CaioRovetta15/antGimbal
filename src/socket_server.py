@@ -27,13 +27,14 @@ def sendCommand(conn, angle1, angle2, lastMsg, debug=False) :
     """
     angle1 = str(angle1).lower()
     angle2 = str(angle2).lower()
+
     # Check exit command
     if angle1 == "exit" or angle2 == "exit":
         conn.sendall("exit\n".encode('utf-8'))
         return False, lastMsg
     # Check input and format it
     try :
-        msg = __formatMessage(str1, str2)
+        msg = __formatMessage(angle1, angle2)
     except ValueError as e:
         print(e)
         msg = lastMsg
@@ -44,8 +45,48 @@ def sendCommand(conn, angle1, angle2, lastMsg, debug=False) :
     lastMsg = str(msg)
     return True, lastMsg
 
+def extract_ip():
+    st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:       
+        st.connect(('10.255.255.255', 1))
+        IP = st.getsockname()[0]
+    except Exception:
+        IP = '127.0.0.1'
+    finally:
+        st.close()
+    return IP
+
+def startThread(debug=False) :
+    """Connect to esp32 via socket.
+    """
+    # Get IP address
+    HOST = extract_ip()
+    PORT = 8890
+    lastMsg = "090090\n" # Default value: 90, 90
+    # Connection 
+    print("--- Antenna Controller Server ---")
+    print(f"Started Server at {HOST} port {PORT}")
+
+    # Create socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((HOST, PORT))
+        s.listen()
+        conn, addr = s.accept()
+        with conn:
+            # Connected successfully
+            print(f"Connected by {addr}")
+            looping = True
+            while( looping ) :
+                # str1 = input()
+                # str2 = input()
+                looping, lastMsg = sendCommand(conn, str1, str2, lastMsg, debug=True)
+            conn.close()
+        s.close()
+
+# makes thread safe socket connection to send commands to esp32
+
 if __name__ == "__main__" :
-    HOST = "192.168.0.115" 
+    HOST = extract_ip()
     PORT = 8890
     lastMsg = "090090\n" # Default value: 90, 90
     # Connection 
