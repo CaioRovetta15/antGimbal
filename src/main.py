@@ -3,12 +3,14 @@
 import rospy 
 import cv2
 import time
+import threading
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 
 # local modules
 from aruco_cube import ArucoCube
 from camera import Camera
+import socket_server 
 import tf_publisher
 import kinematics
 
@@ -38,7 +40,11 @@ if __name__ == '__main__':
 
     # start robot kinematics
     robot = kinematics.DHRobot()
-    
+
+    # start socket thread to send
+    thrd = threading.Thread(target=socket_server.connectESP32, args=(8890,))
+    thrd.start() 
+        
     # main loop
     while not rospy.is_shutdown():
         # get frame
@@ -65,7 +71,7 @@ if __name__ == '__main__':
             q = kinematics.inverse_kinematics(T_robot_target,robot) 
 
             # TODO: send joint angles to esp32
-            # send_joint_angles(q)
+            socket_server.send_joint_angles(q)
 
             
         else:
