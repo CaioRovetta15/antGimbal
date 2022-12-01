@@ -54,7 +54,7 @@ def inverseKinematics(robot, target_point):
     Ttrans=sm.SE3(target_point[0],target_point[1],target_point[2])
 
     #na simulacao o metodo utilizando as trasnsfromacoes de rotacao de pitch e yaw nao funcionou de maneira satisfatoria
-    sol_trasnf = robot.ik_lm_chan(Ttrans,we=[1,1,1,0,0,0])
+    sol_trasnf = robot.ik_lm_chan(Ttrans,we=[1,1,1,0,0,0],q0=robot.q)
     # print(robot.base)
     # print(sol_trasnf)
     #test on forward kinematics

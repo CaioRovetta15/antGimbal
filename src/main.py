@@ -62,7 +62,8 @@ if __name__ == '__main__':
 
             # print(T_robot_target)
             # get the angles of the robot
-            q = kinematics.inverse_kinematics(T_robot_target,robot) 
+            q = kinematics.inverse_kinematics(T_robot_target,robot)
+            robot.q = q
 
             # TODO: send joint angles to esp32
             # send_joint_angles(q)
