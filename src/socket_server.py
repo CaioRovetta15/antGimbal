@@ -1,5 +1,16 @@
 import socket
 import os
+import threading as th
+import time
+
+in1 = 0
+in2 = 0
+
+def send_joint_angles(angle1, angle2):
+    global in1, in2
+    in1 = angle1
+    in2 = angle2
+    return
 
 def __formatMessage(angle1, angle2) :
     # Numeric check
@@ -19,7 +30,7 @@ def __formatMessage(angle1, angle2) :
             angles[i] = "0" + angles[i]
     return (angles[0]+angles[1]+"\n")  
 
-def sendCommand(conn, angle1, angle2, lastMsg, debug=False) :
+def __sendCommand(conn, angle1, angle2, lastMsg, debug=True) :
     """Send commands to servo motor via socket.
     conn: connection session with esp32
     angle1, angle2: servo's target angles
@@ -37,15 +48,19 @@ def sendCommand(conn, angle1, angle2, lastMsg, debug=False) :
         msg = __formatMessage(angle1, angle2)
     except ValueError as e:
         print(e)
-        msg = lastMsg
+    
+    if msg == lastMsg:
+        return True, lastMsg
+
     if debug : print( "Command sent: " + msg, end="" )
+    
     # Send message
     data = msg.encode('utf-8')
     conn.sendall(data)
     lastMsg = str(msg)
     return True, lastMsg
 
-def extract_ip():
+def __extract_ip():
     st = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:       
         st.connect(('10.255.255.255', 1))
@@ -56,20 +71,19 @@ def extract_ip():
         st.close()
     return IP
 
-def startThread(debug=False) :
-    """Connect to esp32 via socket.
-    """
-    # Get IP address
-    HOST = extract_ip()
-    PORT = 8890
+def connectESP32(port, debug=False) :
+    """Connect to esp32 via socket."""
+    # Get IP address dynamically
+    host = __extract_ip()
     lastMsg = "090090\n" # Default value: 90, 90
     # Connection 
     print("--- Antenna Controller Server ---")
-    print(f"Started Server at {HOST} port {PORT}")
+    print(f"Started Server at {host} port {port}")
 
     # Create socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        s.bind((host, port))
         s.listen()
         conn, addr = s.accept()
         with conn:
@@ -77,34 +91,14 @@ def startThread(debug=False) :
             print(f"Connected by {addr}")
             looping = True
             while( looping ) :
-                # str1 = input()
-                # str2 = input()
-                looping, lastMsg = sendCommand(conn, str1, str2, lastMsg, debug=True)
+                looping, lastMsg = __sendCommand(conn, in1, in2, lastMsg, debug=True)
+                print(f"\n In1: {in1} \n In2: {in2}")
+                time.sleep(0.01)
             conn.close()
         s.close()
 
 # makes thread safe socket connection to send commands to esp32
 
 if __name__ == "__main__" :
-    HOST = extract_ip()
-    PORT = 8890
-    lastMsg = "090090\n" # Default value: 90, 90
-    # Connection 
-    print("--- Antenna Controller Server ---")
-    print(f"Started Server at {HOST} port {PORT}")
-    # Socket session
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.bind((HOST, PORT))
-        s.listen()
-        conn, addr = s.accept()
-        with conn:
-            # Connected successfully
-            print(f"Connected by {addr}")
-            looping = True
-            while( looping ) :
-                # Write angle from terminal <- MUDAR ISSO
-                str1 = input()
-                str2 = input()
-                looping, lastMsg = sendCommand(conn, str1, str2, lastMsg, debug=True)
-            conn.close()
-        s.close()
+    thread = th.Thread(target=connectESP32, args=(8890,))
+    thread.start()
