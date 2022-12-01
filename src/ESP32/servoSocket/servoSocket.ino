@@ -13,7 +13,7 @@ Servo servo1, servo2;
 int servoPin1 = 25;
 int servoPin2 = 27;
 const uint16_t port = 8890;
-const char *host = "192.168.154.31";
+const char *host = "192.168.17.31";
 int theta1, theta2, flag;
 
 void setup() {
@@ -34,6 +34,7 @@ void loop() {
   WiFiClient client;
   String msg = "";
   int out = 0;
+  int lastTheta1 = -1, lastTheta2 = -1;
   // Connect to server
   while (!client.connected()) {
     Serial.println("Tentando conectar com IP: 192.168.154.31");
@@ -88,15 +89,18 @@ void loop() {
     /*
       Control servo motors
     */
-    if (theta1 <= 2) servo1.write(5);
-    else servo1.write(theta1);
-    if (theta2 <= 2) servo2.write(5);
-    else servo2.write(theta2);
-    if (theta1 >= 178) servo1.write(175);
-    else servo1.write(theta1);
-    if (theta2 >= 178) servo2.write(175);
-    else servo2.write(theta2);
-
+    if (theta1 != lastTheta1) {
+      if (theta1 <= 2) servo1.write(5);
+      else servo1.write(theta1);
+      if (theta1 >= 178) servo1.write(175);
+      else servo1.write(theta1);
+    }
+    if (theta2 != lastTheta2) {
+      if (theta2 <= 2) servo2.write(5);
+      else servo2.write(theta2);
+      if (theta2 >= 178) servo2.write(175);
+      else servo2.write(theta2);
+    }
     delay(1);
   }
 }

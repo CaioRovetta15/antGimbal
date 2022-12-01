@@ -74,7 +74,7 @@ if __name__ == '__main__':
             q = kinematics.inverse_kinematics(T_robot_target,robot)
             robot.q = q
             
-            yaw_vector.append(np.rad2deg(q[0]) + 94)
+            yaw_vector.append(np.rad2deg(q[0]) + 90)
             pitch_vector.append(np.rad2deg(q[1]) + 87)
 
             if len(yaw_vector) > 10 : yaw_vector.pop(0)
