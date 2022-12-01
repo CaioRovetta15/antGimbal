@@ -1,8 +1,9 @@
 #include <WiFi.h>
-#include <Servo.h>
+// #include <Servo.h>   // For Calvin's PC
+#include <ESP32Servo.h> // For Kuka's lab
 
-#define SSID "Eu tenho internet"
-#define PASSWD "batatabatata"
+#define SSID "megamente"
+#define PASSWD "guisoares10"
 #define ERRO -1
 #define SUCESS 0
 #define EXIT 1
@@ -12,7 +13,7 @@ Servo servo1, servo2;
 int servoPin1 = 25;
 int servoPin2 = 27;
 const uint16_t port = 8890;
-const char *host = "192.168.0.115";
+const char *host = "192.168.154.31";
 int theta1, theta2, flag;
 
 void setup() {
@@ -32,9 +33,10 @@ void setup() {
 void loop() {
   WiFiClient client;
   String msg = "";
+  int out = 0;
   // Connect to server
   while (!client.connected()) {
-    Serial.println("Tentando conectar com IP: 192.168.0.115");
+    Serial.println("Tentando conectar com IP: 192.168.154.31");
     delay(2000);
     if (!client.connect(host, port)) {
       Serial.println("Falha de conexao");
@@ -43,37 +45,45 @@ void loop() {
     }
   }
   Serial.println("Conectado!");
+  delay(200);
   // Session
   while( 1 ) {
-    delay(200);
     flag = READY;
     Serial.println("Esperando nova posicao...");
     // Listens until 10sec idle or 'exit' message
-    for (int i = 0; i < 100 && flag!=SUCESS; i++ ) {
+    for (int i = 0; i < 10000 && flag!=SUCESS; i++ ) {
       if (client.available() > 0) {
         msg = client.readStringUntil('\n');
         flag = readMessage(msg);
         if (flag != READY && flag != SUCESS) break;
       }
-      delay(100);
+      delay(1);
     }
     switch (flag) {
       case READY :
         Serial.println("REINICIANDO POR INATIVIDADE!");
+        out = 1;
+        break;
       case ERRO :
         Serial.println("MENSAGEM MAL FORMATADA!");
         Serial.println("Tamanho: " + msg.length());
         Serial.println( "(" + msg + ")" );
+        out = 1;
+        break;
       case EXIT : 
         Serial.println("ENCERRANDO SISTEMA!");
         delay(2000);
+        out = 1;
+        break;
       case SUCESS :
         Serial.println(theta1);
         Serial.println(theta2);
         break;
-      default :
+
+      if ( out == 1 ) {
         client.stop();
         return;
+      }
     }
     /*
       Control servo motors
@@ -86,6 +96,8 @@ void loop() {
     else servo1.write(theta1);
     if (theta2 >= 178) servo2.write(175);
     else servo2.write(theta2);
+
+    delay(1);
   }
 }
 /*

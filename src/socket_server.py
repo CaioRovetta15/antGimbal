@@ -30,7 +30,7 @@ def __formatMessage(angle1, angle2) :
             angles[i] = "0" + angles[i]
     return (angles[0]+angles[1]+"\n")  
 
-def __sendCommand(conn, angle1, angle2, lastMsg, debug=False) :
+def __sendCommand(conn, angle1, angle2, lastMsg, debug=True) :
     """Send commands to servo motor via socket.
     conn: connection session with esp32
     angle1, angle2: servo's target angles
@@ -48,8 +48,12 @@ def __sendCommand(conn, angle1, angle2, lastMsg, debug=False) :
         msg = __formatMessage(angle1, angle2)
     except ValueError as e:
         print(e)
-        msg = lastMsg
+    
+    if msg == lastMsg:
+        return True, lastMsg
+
     if debug : print( "Command sent: " + msg, end="" )
+    
     # Send message
     data = msg.encode('utf-8')
     conn.sendall(data)
@@ -78,6 +82,7 @@ def connectESP32(port, debug=False) :
 
     # Create socket
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         s.bind((host, port))
         s.listen()
         conn, addr = s.accept()
@@ -87,6 +92,8 @@ def connectESP32(port, debug=False) :
             looping = True
             while( looping ) :
                 looping, lastMsg = __sendCommand(conn, in1, in2, lastMsg, debug=True)
+                print(f"\n In1: {in1} \n In2: {in2}")
+                time.sleep(0.01)
             conn.close()
         s.close()
 

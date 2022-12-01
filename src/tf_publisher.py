@@ -52,9 +52,7 @@ def sendAllTransforms(T_list, frame_ids, parent_frame_ids):
             old = np.array(T_list_old[i], dtype=np.float16)
             new = np.array(T_list[i], dtype=np.float16)
             if (np.allclose(old, new)):
-                print("Same data. Ignoring.")
                 break
-            print("New data. Publishing.")
 
         tf_msg = TransformStamped()
         tf_msg.header.stamp = rospy.Time.now()
