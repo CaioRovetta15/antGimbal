@@ -73,7 +73,6 @@ if __name__ == '__main__':
             # get the angles of the robot
             q = kinematics.inverse_kinematics(T_robot_target,robot)
             robot.q = q
-
             
             yaw_vector.append(np.rad2deg(q[0]) + 90)
             pitch_vector.append(np.rad2deg(q[1]) + 90)

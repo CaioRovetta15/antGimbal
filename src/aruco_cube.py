@@ -25,7 +25,8 @@ class ArucoCube:
         self.ARUCO_PARAMETERS = aruco.DetectorParameters_create()
 
         # Cube dimensions
-        self.marker_length = 0.0525
+        # self.marker_length = 0.0525
+        self.marker_length = 0.096
         self.marker_ids = [0, 1, 2, 3, 4]
 
         # Create vectors we'll be using for rotations and translations for postures
