@@ -11,9 +11,13 @@ class ArucoCube:
 
     def __init__(self) -> None:
         # Camera calibration parameters
-        self.camera_matrix = np.array([[725.7657025001567, 0.0, 302.64698191622074], [0.0, 733.3294790963405, 277.5564048217287], [0.0, 0.0, 1.0]])
-        self.dist_coeffs = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
 
+        # self.camera_matrix = np.array([[725.7657025001567, 0.0, 302.64698191622074], [0.0, 733.3294790963405, 277.5564048217287], [0.0, 0.0, 1.0]])
+        # self.dist_coeffs = np.array([0.0, 0.0, 0.0, 0.0, 0.0])
+
+        self.camera_matrix = np.array([[696.88663, 0.0, 330.00504],[0.0, 697.1201, 249.02112],[0.0, 0.0, 1.0]])*2
+        self.dist_coeffs = np.array([-0.01191, 0.9683, 0.0046, 0.00033, -3.07082])
+        
         # Load the dictionary that was used to generate the markers.
         self.DICTIONARY = aruco.getPredefinedDictionary(aruco.DICT_4X4_50)
 

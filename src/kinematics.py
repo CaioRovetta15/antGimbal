@@ -90,11 +90,15 @@ def inverse_kinematics(robot_target,robot=DHRobot()):
     target_point=sm.SE3(robot_target).t
     # rospy.loginfo(robot_target)
     # work_space_target, normal_vectors = robotNormals(robot, robot_base)
-    print(target_point)
     q=inverseKinematics(robot,target_point)
     # f="inverse_kinematics" + str((q[0]*180/math.pi,q[1]*180/math.pi))
     # rospy.loginfo(f)
-    return (q[0],q[1])
+    print(f"Target point: {target_point}")
+    if target_point[2] >= 0:
+        q[1] = np.abs(q[1])
+    else:
+        q[1] = -np.abs(q[1])
+    return (q)
     # visualize(robot,work_space,normal_vectors,[0.0,0.0,0.0])
 if __name__ == "__main__":
     inverse_kinematics()

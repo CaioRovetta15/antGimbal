@@ -92,7 +92,7 @@ def connectESP32(port, debug=False) :
             looping = True
             while( looping ) :
                 looping, lastMsg = __sendCommand(conn, in1, in2, lastMsg, debug=True)
-                print(f"\n In1: {in1} \n In2: {in2}")
+                # print(f"\n In1: {in1} \n In2: {in2}")
                 time.sleep(0.01)
             conn.close()
         s.close()

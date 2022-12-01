@@ -7,6 +7,7 @@ import numpy as np
 import threading
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
+from statistics import mean 
 
 # local modules
 from aruco_cube import ArucoCube
@@ -33,7 +34,7 @@ if __name__ == '__main__':
     image_cube_pub = rospy.Publisher('aruco_cube/image_debug', Image, queue_size=1)
 
     # create camera and cube
-    cam = Camera()
+    cam = Camera(2, 60, width=1280, height=720)
     cube = ArucoCube()
 
     # start camera
@@ -46,6 +47,8 @@ if __name__ == '__main__':
     thrd = threading.Thread(target=socket_server.connectESP32, args=(8890,))
     thrd.start() 
         
+    yaw_vector = []        
+    pitch_vector = []
     # main loop
     while not rospy.is_shutdown():
         # get frame
@@ -66,15 +69,21 @@ if __name__ == '__main__':
             tf_publisher.sendAllTransforms([T_cam_cube], ['camera_optical'], ['cube'])
 
             T_robot_target = tf_publisher.getTransform('base_link', 'target')
-
             # print(T_robot_target)
             # get the angles of the robot
             q = kinematics.inverse_kinematics(T_robot_target,robot)
             robot.q = q
 
-            # TODO: send joint angles to esp32
-            angle1 = int(round(np.rad2deg(q[0]) + 90, 0))
-            angle2 = int(round(np.rad2deg(q[1]) + 90, 0))
+            
+            yaw_vector.append(np.rad2deg(q[0]) + 90)
+            pitch_vector.append(np.rad2deg(q[1]) + 90)
+
+            if len(yaw_vector) > 10 : yaw_vector.pop(0)
+            if len(pitch_vector) > 10 : pitch_vector.pop(0)
+
+            # send joint angles to esp32
+            angle1 = int(round(mean(yaw_vector), 0))
+            angle2 = int(round(mean(pitch_vector), 0))
             socket_server.send_joint_angles(angle1, angle2)
 
             
